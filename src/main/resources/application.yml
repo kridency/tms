@@ -1,0 +1,55 @@
+app:
+  pagination-limit: 20
+  jwt:
+    secret: "9a4f2c8d3b7a1e6f45c8a0b3f267d8b1d4e6f3c8a9d2b5f8e3a9c8b5f6v8a3d9"
+    tokenExpiration: 30m
+    refreshTokenExpiration: 60m
+
+server:
+  forward-headers-strategy: framework
+  ssl:
+    key-store: classpath:keystore/keystore.jks
+    key-store-password: password
+    key-store-type: pkcs12
+    key-alias: task-manager
+    key-password: password
+    enabled: true
+  port: 8443
+
+
+spring:
+  application:
+    name: Task Management System
+  datasource:
+    url: jdbc:postgresql://localhost:5432/task_db
+    username: postgres
+    password: postgres
+    hikari:
+      schema: task_management_schema
+      data-source-properties:
+        rewriteBatchedStatements: true
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+    generate-ddl: true
+    show-sql: true
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        jakarta:
+          persistence:
+            schema-generation:
+              create-database-schemas: true
+        hbm2ddl:
+          auto: create
+          create_namespaces: true
+        format_sql: true
+        default_schema: task_management_schema
+
+  security:
+    user:
+      name: user
+      password: 1308cf51-8da1-4aa0-966f-f3c0d0b066e7
