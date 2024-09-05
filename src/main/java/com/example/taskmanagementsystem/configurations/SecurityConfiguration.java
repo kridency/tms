@@ -1,6 +1,5 @@
 package com.example.taskmanagementsystem.configurations;
 
-import com.example.taskmanagementsystem.securities.UserDetailsServiceImpl;
 import com.example.taskmanagementsystem.securities.jwt.JwtAuthenticationEntryPoint;
 import com.example.taskmanagementsystem.securities.jwt.JwtTokenFilter;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -36,7 +35,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @OpenAPIDefinition(security = {@SecurityRequirement(name = "bearer-key")})
 @RequiredArgsConstructor
 public class SecurityConfiguration {
-    private final UserDetailsServiceImpl userDetailsService;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtTokenFilter jwtTokenFilter;
 

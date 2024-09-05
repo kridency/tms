@@ -37,11 +37,8 @@ public class SecurityService {
                         .authenticate(new UsernamePasswordAuthenticationToken(email, loginRequest.getPassword()));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
                 AppUserDetails userDetails = (AppUserDetails) authentication.getPrincipal();
-
                 List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-
                 RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
                 return AuthResponse.builder().id(userDetails.getId()).token(jwtUtils.generateJwtToken(userDetails))

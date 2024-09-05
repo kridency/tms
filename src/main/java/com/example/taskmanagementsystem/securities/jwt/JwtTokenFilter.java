@@ -1,5 +1,6 @@
 package com.example.taskmanagementsystem.securities.jwt;
 
+import jakarta.annotation.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,9 +27,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@Nullable HttpServletRequest request, @Nullable HttpServletResponse response,
+                                    @Nullable  FilterChain filterChain)
             throws ServletException, IOException {
         try {
+            assert request != null;
             String jwtToken = getToken(request);
 
             if(jwtToken != null && jwtUtils.validate(jwtToken)) {
@@ -46,6 +49,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             log.error("Cannot set user authentication: {}", e.getMessage());
         }
 
+        assert filterChain != null;
         filterChain.doFilter(request,response);
     }
     private String getToken(HttpServletRequest request) {
