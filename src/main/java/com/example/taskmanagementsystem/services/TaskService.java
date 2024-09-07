@@ -6,6 +6,7 @@ import com.example.taskmanagementsystem.entities.Task;
 import com.example.taskmanagementsystem.entities.TaskStatus;
 import com.example.taskmanagementsystem.mappers.CommentMapper;
 import com.example.taskmanagementsystem.mappers.TaskMapper;
+import com.example.taskmanagementsystem.mappers.UserMapper;
 import com.example.taskmanagementsystem.repositories.CommentRepository;
 import com.example.taskmanagementsystem.repositories.TaskRepository;
 import com.example.taskmanagementsystem.repositories.UserRepository;
@@ -27,6 +28,7 @@ public class TaskService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final UserService userService;
+    private final UserMapper userMapper;
 
     private final TaskMapper taskMapper = TaskMapper.INSTANCE;
     private final CommentMapper commentMapper = CommentMapper.INSTANCE;
