@@ -42,9 +42,4 @@ public interface UserMapper {
             @Mapping(source = "roles", target = "roles", qualifiedByName = "toRoles")
     })
     User userDtoToUser(UserDto user);
-
-    @Named("getUserEntity")
-    default User map(String email, @Context UserService userService) {
-        return userService.findByEmail(email);
-    }
 }

@@ -12,7 +12,6 @@ public class UserService {
     private final UserRepository userRepository;
 
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Пользователь с Email = " + email + " не найден."));
+        return userRepository.findByEmail(email).orElse(null);
     }
 }

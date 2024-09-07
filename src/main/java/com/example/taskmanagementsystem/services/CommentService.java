@@ -4,6 +4,7 @@ import com.example.taskmanagementsystem.dto.CommentDto;
 import com.example.taskmanagementsystem.dto.TaskDto;
 import com.example.taskmanagementsystem.entities.Comment;
 import com.example.taskmanagementsystem.mappers.CommentMapper;
+import com.example.taskmanagementsystem.mappers.UserMapper;
 import com.example.taskmanagementsystem.repositories.CommentRepository;
 import com.example.taskmanagementsystem.repositories.UserRepository;
 import com.example.taskmanagementsystem.repositories.TaskRepository;
@@ -20,7 +21,9 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserService userService;
     private final TaskService taskService;
+
     private final CommentMapper commentMapper = CommentMapper.INSTANCE;
+    private final UserMapper userMapper = UserMapper.INSTANCE;
 
     public CommentDto getById(Long id) {
         return commentRepository.findById(id).map(commentMapper::commentToCommentDto)

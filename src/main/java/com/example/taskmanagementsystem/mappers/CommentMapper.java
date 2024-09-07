@@ -3,6 +3,7 @@ package com.example.taskmanagementsystem.mappers;
 import com.example.taskmanagementsystem.dto.CommentDto;
 import com.example.taskmanagementsystem.entities.Comment;
 import com.example.taskmanagementsystem.entities.Task;
+import com.example.taskmanagementsystem.entities.User;
 import com.example.taskmanagementsystem.services.TaskService;
 import com.example.taskmanagementsystem.services.UserService;
 import org.mapstruct.*;
@@ -28,7 +29,7 @@ public interface CommentMapper {
 
     @Mappings({
             @Mapping(source = "id", target = "id"),
-            @Mapping(source = "talker", target = "talker", qualifiedByName = {"UserMapper", "getUserEntity"}),
+            @Mapping(source = "talker", target = "talker", qualifiedByName = "getTalker"),
             @Mapping(source = "task", target = "task", qualifiedByName = "getTask"),
             @Mapping(source = "text", target = "text")
     })
@@ -38,5 +39,10 @@ public interface CommentMapper {
     @Named("getTask")
     default Task map(Long id, @Context TaskService taskService, @Context UserService userService) {
         return TaskMapper.INSTANCE.taskDtoToTask(taskService.getById(id), taskService, userService);
+    }
+
+    @Named("getTalker")
+    default User map(String email, @Context UserService userService) {
+        return userService.findByEmail(email);
     }
 }

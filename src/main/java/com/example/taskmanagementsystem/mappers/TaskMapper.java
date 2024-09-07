@@ -5,6 +5,7 @@ import com.example.taskmanagementsystem.dto.TaskDto;
 import com.example.taskmanagementsystem.entities.Comment;
 import com.example.taskmanagementsystem.entities.Task;
 import com.example.taskmanagementsystem.entities.TaskStatus;
+import com.example.taskmanagementsystem.entities.User;
 import com.example.taskmanagementsystem.services.TaskService;
 import com.example.taskmanagementsystem.services.UserService;
 import org.mapstruct.*;
@@ -47,8 +48,8 @@ public interface TaskMapper {
     }
 
     @Mappings({
-            @Mapping(source = "author", target = "author", qualifiedByName = {"UserMapper", "getUserEntity"}),
-            @Mapping(source = "worker", target = "worker", qualifiedByName = {"UserMapper", "getUserEntity"}),
+            @Mapping(source = "author", target = "author", qualifiedByName = "getUserEntity"),
+            @Mapping(source = "worker", target = "worker", qualifiedByName = "getUserEntity"),
             @Mapping(source = "title", target = "title"),
             @Mapping(source = "status", target = "status", qualifiedByName = "toStatus"),
             @Mapping(source = "comments", target = "comments", qualifiedByName = "toComments")
@@ -58,4 +59,9 @@ public interface TaskMapper {
     @IterableMapping(qualifiedByName = {"CommentMapper", "commentDtoToComment"})
     @Named("toComments")
     List<Comment> map(Collection<CommentDto> comments, @Context TaskService taskService, @Context UserService userService);
+
+    @Named("getUserEntity")
+    default User map(String email, @Context UserService userService) {
+        return userService.findByEmail(email);
+    }
 }
