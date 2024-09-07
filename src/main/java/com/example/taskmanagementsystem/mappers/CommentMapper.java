@@ -2,12 +2,17 @@ package com.example.taskmanagementsystem.mappers;
 
 import com.example.taskmanagementsystem.dto.CommentDto;
 import com.example.taskmanagementsystem.entities.Comment;
+import com.example.taskmanagementsystem.entities.Task;
 import com.example.taskmanagementsystem.services.TaskService;
 import com.example.taskmanagementsystem.services.UserService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = {
+        TaskService.class,
+        UserService.class,
+        TaskMapper.class,
+        UserMapper.class})
 @Named("CommentMapper")
 public interface CommentMapper {
     CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
@@ -23,14 +28,15 @@ public interface CommentMapper {
 
     @Mappings({
             @Mapping(source = "id", target = "id"),
-            @Mapping(target = "talker",
-                    expression = "java(userService.findByEmail(commentDto.getTalker()))"),
-            @Mapping(target = "task",
-                    expression = "java(taskMapper.taskDtoToTask(taskService.getById(commentDto.getTask()), " +
-                            "userService, userMapper, taskService, INSTANCE))"),
+            @Mapping(source = "talker", target = "talker", qualifiedByName = {"UserMapper", "getUserEntity"}),
+            @Mapping(source = "task", target = "task", qualifiedByName = "getTask"),
             @Mapping(source = "text", target = "text")
     })
     @Named("commentDtoToComment")
-    Comment commentDtoToComment(CommentDto commentDto, @Context UserService userService, @Context UserMapper userMapper,
-                                @Context TaskService taskService, @Context TaskMapper taskMapper);
+    Comment commentDtoToComment(CommentDto commentDto, @Context TaskService taskService, @Context UserService userService);
+
+    @Named("getTask")
+    default Task map(Long id, @Context TaskService taskService, @Context UserService userService) {
+        return TaskMapper.INSTANCE.taskDtoToTask(taskService.getById(id), taskService, userService);
+    }
 }

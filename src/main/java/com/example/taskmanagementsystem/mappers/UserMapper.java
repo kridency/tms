@@ -3,6 +3,7 @@ package com.example.taskmanagementsystem.mappers;
 import com.example.taskmanagementsystem.dto.UserDto;
 import com.example.taskmanagementsystem.entities.RoleType;
 import com.example.taskmanagementsystem.entities.User;
+import com.example.taskmanagementsystem.services.UserService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -10,7 +11,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { UserService.class })
+@Named("UserMapper")
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
@@ -40,4 +42,9 @@ public interface UserMapper {
             @Mapping(source = "roles", target = "roles", qualifiedByName = "toRoles")
     })
     User userDtoToUser(UserDto user);
+
+    @Named("getUserEntity")
+    default User map(String email, @Context UserService userService) {
+        return userService.findByEmail(email);
+    }
 }

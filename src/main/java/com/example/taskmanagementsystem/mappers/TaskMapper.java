@@ -14,8 +14,11 @@ import java.util.Collection;
 import java.util.List;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = {
+        UserMapper.class,
+        UserService.class,
         CommentMapper.class
 })
+@Named("TaskMapper")
 public interface TaskMapper {
     TaskMapper INSTANCE = Mappers.getMapper(TaskMapper.class);
 
@@ -26,7 +29,7 @@ public interface TaskMapper {
 
     @IterableMapping(qualifiedByName = {"CommentMapper", "commentToCommentDto"})
     @Named("fromComments")
-    Collection<CommentDto> map(List<Comment> comments, @Context CommentMapper commentMapper);
+    Collection<CommentDto> map(List<Comment> comments);
 
     @Mappings({
             @Mapping(source = "id", target = "id"),
@@ -36,7 +39,7 @@ public interface TaskMapper {
             @Mapping(source = "status", target = "status", qualifiedByName = "fromStatus"),
             @Mapping(source = "comments", target = "comments", qualifiedByName = "fromComments")
     })
-    TaskDto taskToTaskDto(Task task, @Context CommentMapper commentMapper);
+    TaskDto taskToTaskDto(Task task);
 
     @Named("toStatus")
     default TaskStatus map(String status) {
@@ -44,17 +47,15 @@ public interface TaskMapper {
     }
 
     @Mappings({
-            @Mapping(target = "author",
-                    expression = "java(userService.findByEmail(taskDto.getAuthor()))"),
-            @Mapping(target = "worker",
-                    expression = "java(taskDto.getWorker()!=null ? userService.findByEmail(taskDto.getWorker()):null)"),
+            @Mapping(source = "author", target = "author", qualifiedByName = {"UserMapper", "getUserEntity"}),
+            @Mapping(source = "worker", target = "worker", qualifiedByName = {"UserMapper", "getUserEntity"}),
             @Mapping(source = "title", target = "title"),
             @Mapping(source = "status", target = "status", qualifiedByName = "toStatus"),
-            @Mapping(target = "comments",
-                    expression = "java(taskService.getCommentsByTask(taskDto.getId()).stream()"+
-                            ".map(comment -> commentMapper.commentDtoToComment(comment, userService, " +
-                            "userMapper, taskService, INSTANCE)).toList())")
+            @Mapping(source = "comments", target = "comments", qualifiedByName = "toComments")
     })
-    Task taskDtoToTask(TaskDto taskDto, @Context UserService userService, @Context UserMapper userMapper,
-                       @Context TaskService taskService, @Context CommentMapper commentMapper);
+    Task taskDtoToTask(TaskDto taskDto, @Context TaskService taskService, @Context UserService userService);
+
+    @IterableMapping(qualifiedByName = {"CommentMapper", "commentDtoToComment"})
+    @Named("toComments")
+    List<Comment> map(Collection<CommentDto> comments, @Context TaskService taskService, @Context UserService userService);
 }

@@ -6,7 +6,6 @@ import com.example.taskmanagementsystem.entities.Task;
 import com.example.taskmanagementsystem.entities.TaskStatus;
 import com.example.taskmanagementsystem.mappers.CommentMapper;
 import com.example.taskmanagementsystem.mappers.TaskMapper;
-import com.example.taskmanagementsystem.mappers.UserMapper;
 import com.example.taskmanagementsystem.repositories.CommentRepository;
 import com.example.taskmanagementsystem.repositories.TaskRepository;
 import com.example.taskmanagementsystem.repositories.UserRepository;
@@ -28,9 +27,9 @@ public class TaskService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final UserService userService;
+
     private final TaskMapper taskMapper = TaskMapper.INSTANCE;
     private final CommentMapper commentMapper = CommentMapper.INSTANCE;
-    private final UserMapper userMapper = UserMapper.INSTANCE;
 
     public Slice<TaskDto> getAllFiltered(String author, String worker, Pageable pageable) {
         Collection<TaskDto> result = taskRepository.findAll(new TaskSpecification(new HashMap<>() {{
@@ -40,12 +39,12 @@ public class TaskService {
                 put("worker", Optional.ofNullable(worker).map(worker -> userRepository.findByEmail(worker)
                         .orElseThrow(() -> new NotFoundException("Исполнитель с Email = " + worker + " не найден.")))
                         .orElse(null));
-            }}), pageable).getContent().stream().map(task -> taskMapper.taskToTaskDto(task, commentMapper)).toList();
+            }}), pageable).getContent().stream().map(taskMapper::taskToTaskDto).toList();
         return new SliceImpl<>(result.stream().toList(), pageable, result.iterator().hasNext());
     }
 
     public TaskDto getById(Long id) {
-        return taskRepository.findById(id).map(task -> taskMapper.taskToTaskDto(task, commentMapper))
+        return taskRepository.findById(id).map(taskMapper::taskToTaskDto)
                 .orElseThrow(() -> new NotFoundException("Задача с ID = " + id + " не найдена."));
     }
 
@@ -56,7 +55,7 @@ public class TaskService {
     public Long create(TaskDto taskDto) {
         if (taskDto == null) throw new BadRequestException("Неверно задан запрос.");
         return userRepository.findByEmail(taskDto.getAuthor()).map(author -> {
-                    Task task = taskMapper.taskDtoToTask(taskDto, userService, userMapper, this, commentMapper);
+                    Task task = taskMapper.taskDtoToTask(taskDto, this, userService);
                     Optional.ofNullable(taskDto.getWorker()).ifPresent(worker ->
                         userRepository.findByEmail(worker).ifPresentOrElse(task::setWorker, () ->
                                 {
