@@ -31,7 +31,6 @@ public class TaskService {
 
     private final TaskMapper taskMapper = TaskMapper.INSTANCE;
     private final CommentMapper commentMapper = CommentMapper.INSTANCE;
-    private final UserMapper userMapper = UserMapper.INSTANCE;
 
     public Slice<TaskDto> getAllFiltered(String author, String worker, Pageable pageable) {
         Collection<TaskDto> result = taskRepository.findAll(new TaskSpecification(new HashMap<>() {{

@@ -23,7 +23,6 @@ public class CommentService {
     private final TaskService taskService;
 
     private final CommentMapper commentMapper = CommentMapper.INSTANCE;
-    private final UserMapper userMapper = UserMapper.INSTANCE;
 
     public CommentDto getById(Long id) {
         return commentRepository.findById(id).map(commentMapper::commentToCommentDto)
