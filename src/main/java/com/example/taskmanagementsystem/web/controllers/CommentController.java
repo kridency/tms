@@ -5,12 +5,14 @@ import com.example.taskmanagementsystem.services.CommentService;
 import com.example.taskmanagementsystem.web.models.SimpleResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@SecurityRequirement(name = "Authentication")
 @RequestMapping("/api/comments")
 @RequiredArgsConstructor
 public class CommentController {

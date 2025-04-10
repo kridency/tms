@@ -16,7 +16,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -31,7 +30,7 @@ import java.util.HashSet;
 @Testcontainers
 public class AbstractTest {
     protected static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
-            DockerImageName.parse("postgres:12.3"));
+            DockerImageName.parse("postgres:12.20"));
 
     static { postgreSQLContainer.withReuse(true).start(); }
 
@@ -50,9 +49,6 @@ public class AbstractTest {
 
     @Autowired
     protected UserRepository userRepository;
-
-    @Autowired
-    protected WebApplicationContext webApplicationContext;
 
     @Autowired
     protected MockMvc mockMvc;

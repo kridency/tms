@@ -16,10 +16,10 @@ server:
     enabled: true
   port: 8443
 
-
 spring:
   application:
     name: Task Management System
+
   datasource:
     url: jdbc:postgresql://localhost:5432/task_db
     username: postgres
@@ -33,18 +33,21 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     generate-ddl: true
     show-sql: true
     properties:
       hibernate:
+        transaction:
+          jta:
+            platform: com.atomikos.icatch.jta.hibernate4.AtomikosPlatform
         globally_quoted_identifiers: true
         jakarta:
           persistence:
             schema-generation:
               create-database-schemas: true
         hbm2ddl:
-          auto: create
+          auto: update
           create_namespaces: true
         format_sql: true
         default_schema: task_management_schema
@@ -53,3 +56,12 @@ spring:
     user:
       name: user
       password: 1308cf51-8da1-4aa0-966f-f3c0d0b066e7
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /openapi-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui/index.html
+  enable-spring-security: true

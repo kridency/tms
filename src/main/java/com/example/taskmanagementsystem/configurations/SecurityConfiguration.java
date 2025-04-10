@@ -3,10 +3,12 @@ package com.example.taskmanagementsystem.configurations;
 import com.example.taskmanagementsystem.securities.jwt.JwtAuthenticationEntryPoint;
 import com.example.taskmanagementsystem.securities.jwt.JwtTokenFilter;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.servers.Server;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +25,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -32,18 +33,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@OpenAPIDefinition(security = {@SecurityRequirement(name = "bearer-key")})
+@OpenAPIDefinition(servers = {@Server(url = "/", description = "Default Server URL")},
+        security = {@SecurityRequirement(name = "Authentication") })
+@SecurityScheme(name = "Authentication", scheme = "bearer", bearerFormat = "JWT",
+        type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtTokenFilter jwtTokenFilter;
-
-    @Bean
-    public OpenApiCustomizer customerGlobalHeaderOpenApiCustomizer() {
-        return openApi -> openApi.getComponents()
-                .addSecuritySchemes("bearer-key",
-                        new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT"));
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -59,7 +56,7 @@ public class SecurityConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "app.security", name = "type")
     public PasswordEncoder  inMemoryPasswordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 
 
@@ -102,11 +99,16 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests((auth) -> auth.requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/app/**").permitAll()
-                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/proxy/**")
-                        .permitAll().anyRequest().authenticated()).exceptionHandling(configurer -> configurer
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)).csrf(AbstractHttpConfigurer::disable)
+        http
+                .authorizeHttpRequests(auth ->
+                        auth.requestMatchers("/openapi-docs", "/openapi-docs/**", "/swagger-ui/**", "/proxy/**",
+                                        "/api/auth/**", "/api/app/**")
+                        .permitAll().anyRequest().authenticated()
+                ).exceptionHandling(customizer ->
+                        customizer.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                ).cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults()).sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
