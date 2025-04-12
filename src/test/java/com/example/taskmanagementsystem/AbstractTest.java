@@ -4,6 +4,7 @@ import com.example.taskmanagementsystem.entities.RoleType;
 import com.example.taskmanagementsystem.repositories.UserRepository;
 import com.example.taskmanagementsystem.securities.UserService;
 import com.example.taskmanagementsystem.web.models.AuthRequest;
+import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
@@ -25,23 +27,26 @@ import java.util.HashSet;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 @ActiveProfiles("test")
+@Transactional
 @Testcontainers
-public class AbstractTest {
-    protected static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
+public abstract class AbstractTest {
+    @Container
+    private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
             DockerImageName.parse("postgres:12.20"));
 
-    static { postgreSQLContainer.withReuse(true).start(); }
+    @Container
+    private static final RedisContainer redisContainer = new RedisContainer(
+            DockerImageName.parse("redis:7.0.12"));
 
     @DynamicPropertySource
-    public static void registerProperties(DynamicPropertyRegistry registry) {
+    private static void registerProperties(DynamicPropertyRegistry registry) {
         String jdbcUrl = postgreSQLContainer.getJdbcUrl();
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
         registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
         registry.add("spring.datasource.url",() -> jdbcUrl);
-        registry.add("spring.datasource.hikari.schema",() -> "task_management_schema");
-        registry.add("spring.jpa.properties.hibernate.jakarta.persistence.create-database-schemas",() -> "true");
+        registry.add("spring.data.redis.host", redisContainer::getHost);
+        registry.add("spring.data.redis.port", redisContainer::getFirstMappedPort);
     }
 
     @Autowired
@@ -53,17 +58,22 @@ public class AbstractTest {
     @Autowired
     protected MockMvc mockMvc;
 
+    static {
+        postgreSQLContainer.withReuse(true).start();
+        redisContainer.withReuse(true).start();
+    }
+
     @BeforeEach
-    public void setup() {
+    protected void setup() {
         userService.register(AuthRequest.builder().email("user@usa.net").password("54321")
                 .roles(new HashSet<>() {{add(RoleType.ROLE_USER);}}).build());
 
         userService.register(AuthRequest.builder().email("admin@usa.net").password("12345")
-                .roles(new HashSet<>() {{ add(RoleType.ROLE_USER); }}).build());
+                .roles(new HashSet<>() {{ add(RoleType.ROLE_ADMIN); }}).build());
     }
 
     @AfterEach
-    public void afterEach() {
+    protected void afterEach() {
         userRepository.deleteAll();
     }
 }

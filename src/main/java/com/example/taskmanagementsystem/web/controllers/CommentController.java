@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -28,8 +27,8 @@ public class CommentController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public CommentDto postComment(@RequestBody CommentRequest request,
-                                                  @AuthenticationPrincipal UserDetails userDetails) {
-        return commentService.create(request, userDetails.getUsername());
+                                                  @AuthenticationPrincipal String username) {
+        return commentService.create(request, username);
     }
 
     @Operation(summary = "Получить комментарий по идентификатору",
@@ -39,8 +38,8 @@ public class CommentController {
     public Collection<CommentDto> listComments(@RequestParam(name = "taskTitle")
                                                          @Parameter(description = "Идентификационный номер комментария")
                                                      String taskTitle,
-                                                             @AuthenticationPrincipal UserDetails userDetails) {
-        return commentService.listComments(taskTitle, userDetails.getUsername());
+                                                             @AuthenticationPrincipal String username) {
+        return commentService.listComments(taskTitle, username);
     }
 
     @Operation(summary = "Изменить комментарий по идентификатору",
@@ -51,8 +50,8 @@ public class CommentController {
                                                         @Parameter(description = "Идентификационный номер комментария")
                                                         Instant createDate,
                                            @RequestBody CommentRequest request,
-                                                    @AuthenticationPrincipal UserDetails userDetails) {
-        return commentService.update(createDate, request, userDetails.getUsername());
+                                                    @AuthenticationPrincipal String username) {
+        return commentService.update(createDate, request, username);
     }
 
     @Operation(summary = "Удалить комментарий по идентификатору",
@@ -62,8 +61,8 @@ public class CommentController {
     public SimpleResponse deleteComment(@RequestParam(name = "create_date")
                                                             @Parameter(description = "Идентификационный номер комментария")
                                                             Instant createDate,
-                                                        @AuthenticationPrincipal UserDetails userDetails) {
-        commentService.delete(createDate, userDetails.getUsername());
+                                                        @AuthenticationPrincipal String username) {
+        commentService.delete(createDate, username);
         return new SimpleResponse("Комментарий от " + createDate + " удален.");
     }
 }

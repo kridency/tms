@@ -20,6 +20,7 @@ import java.util.UUID;
 public class TokenService {
     @Value("${app.jwt.refreshTokenExpiration}")
     private Duration refreshTokenExpiration;
+
     private final TokenRepository tokenRepository;
     private final JwtUtils jwtUtils;
 

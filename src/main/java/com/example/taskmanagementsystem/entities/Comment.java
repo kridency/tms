@@ -11,7 +11,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Table(name = "comment",
-        uniqueConstraints = {@UniqueConstraint(name = "uc_comment", columnNames = {"createDate", "talker"})})
+        uniqueConstraints = {@UniqueConstraint(name = "uc_comment", columnNames = { "create_date", "talker_id" })})
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,7 +32,7 @@ public class Comment {
     @PrimaryKeyJoinColumn(name = "talker_id", referencedColumnName = "id")
     private User talker;
 
-    public Comment(Task task, User talker, String text) {
+    public Comment(Task task, String text, User talker) {
         setTask(task);
         setText(text);
         setTalker(talker);

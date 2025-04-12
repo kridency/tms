@@ -34,8 +34,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
 @RequiredArgsConstructor
 public class SecurityConfiguration {
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -48,7 +46,10 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, TokenService tokenService, JwtTokenFilter jwtTokenFilter)
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           TokenService tokenService,
+                                           JwtTokenFilter jwtTokenFilter,
+                                           JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint)
             throws Exception {
         http
                 .authorizeHttpRequests(auth ->

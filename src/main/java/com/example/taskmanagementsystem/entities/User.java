@@ -3,6 +3,7 @@ package com.example.taskmanagementsystem.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,11 +23,14 @@ public class User {
     @Column(name = "roles", nullable = false)
     @Enumerated(EnumType.STRING)
     private Set<RoleType> roles;
+    @OneToMany(mappedBy = "talker", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private Set<Comment> comments;
 
     public User(String email, String password) {
         setEmail(email);
         setPassword(password);
         roles.add(RoleType.ROLE_USER);
+        comments = new HashSet<>();
     }
 
     public UUID getId() {

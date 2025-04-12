@@ -28,7 +28,7 @@ public class Task {
     @Enumerated(EnumType.STRING)
     @Column(name = "priority")
     private PriorityType priority;
-    @OneToMany(mappedBy = "task", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "task", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Set<Comment> comments;
 
     public Task(String title, String description, StatusType status, PriorityType priority) {

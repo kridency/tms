@@ -20,12 +20,17 @@ spring:
   application:
     name: Task Management System
 
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
+
   datasource:
     url: jdbc:postgresql://localhost:5432/task_db
     username: postgres
     password: postgres
     hikari:
-      schema: task_management_schema
+      schema: task_schema
       data-source-properties:
         rewriteBatchedStatements: true
     driver-class-name: org.postgresql.Driver
@@ -33,7 +38,7 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     generate-ddl: true
     show-sql: true
     properties:
@@ -50,7 +55,7 @@ spring:
           auto: create
           create_namespaces: true
         format_sql: true
-        default_schema: task_management_schema
+        default_schema: task_schema
 
   security:
     user:

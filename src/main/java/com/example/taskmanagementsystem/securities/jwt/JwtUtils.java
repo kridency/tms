@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-@Component
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class JwtUtils {
     private final AppProperties.JwtProperties properties;

@@ -19,7 +19,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -63,8 +62,8 @@ public class TaskController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(params = { "title" })
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public TaskDto getTask(@RequestParam String title, @AuthenticationPrincipal UserDetails userDetails) {
-        return taskMapper.taskToTaskDto(taskService.findByTitleAndAuthorOrExecutor(title, userDetails.getUsername()));
+    public TaskDto getTask(@RequestParam String title, @AuthenticationPrincipal String username) {
+        return taskMapper.taskToTaskDto(taskService.findByTitleAndAuthorOrExecutor(title, username));
     }
 
     @Operation(summary = "Зарегистрировать новую задачу",
@@ -73,8 +72,8 @@ public class TaskController {
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public TaskDto createTask(@RequestBody TaskRequest request,
-                                              @AuthenticationPrincipal UserDetails userDetails) {
-        return taskService.create(request, userDetails.getUsername());
+                                              @AuthenticationPrincipal String username) {
+        return taskService.create(request, username);
     }
 
     @Operation(summary = "Обновить задачу",
@@ -82,8 +81,8 @@ public class TaskController {
     @ResponseStatus(HttpStatus.CREATED)
     @PutMapping
     public TaskDto updateTask(@RequestBody TaskRequest request,
-                                              @AuthenticationPrincipal UserDetails userDetails) {
-        return taskService.update(request, userDetails.getUsername());
+                                              @AuthenticationPrincipal String username) {
+        return taskService.update(request, username);
     }
 
     @Operation(summary = "Удалить задачу",
@@ -92,8 +91,8 @@ public class TaskController {
     @DeleteMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public SimpleResponse deleteTask(@RequestBody TaskRequest request,
-                                                     @AuthenticationPrincipal UserDetails userDetails) {
-        taskService.delete(request, userDetails.getUsername());
+                                                     @AuthenticationPrincipal String username) {
+        taskService.delete(request, username);
         return new SimpleResponse("Задача = " + request.getTitle() + " удалена.");
     }
 }
