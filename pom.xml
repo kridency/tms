@@ -17,6 +17,7 @@
         <spring.framework.version>6.4.4</spring.framework.version>
         <springdoc.version>2.8.6</springdoc.version>
         <testcontainers.version>1.20.6</testcontainers.version>
+        <testcontainers-redis.version>2.2.0</testcontainers-redis.version>
         <apache.commons.version>1.27.1</apache.commons.version>
         <jedis.version>5.2.0</jedis.version>
         <jjwt-api.version>0.12.6</jjwt-api.version>
@@ -32,6 +33,8 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <junit.jupiter.version>5.11.0</junit.jupiter.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <httpclient5.version>5.4.3</httpclient5.version>
+        <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
         <spring-boot.run.jvmArguments>-Duser.timezone='Timezone/Moscow'</spring-boot.run.jvmArguments>
     </properties>
 
@@ -90,6 +93,28 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <version>${spring-boot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-handler</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>4.1.119.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+            <version>4.1.119.Final</version>
         </dependency>
 
         <dependency>
@@ -230,14 +255,14 @@
         <dependency>
             <groupId>com.redis</groupId>
             <artifactId>testcontainers-redis</artifactId>
-            <version>2.2.0</version>
+            <version>${testcontainers-redis.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.4.3</version>
+            <version>${httpclient5.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -284,7 +309,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>
                         -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
