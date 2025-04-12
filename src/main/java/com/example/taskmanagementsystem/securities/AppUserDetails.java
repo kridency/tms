@@ -7,14 +7,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class AppUserDetails implements UserDetails {
     private final User user;
-
-    public Long getId() {
-        return user.getId();
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

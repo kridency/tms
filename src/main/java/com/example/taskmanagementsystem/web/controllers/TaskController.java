@@ -1,11 +1,9 @@
 package com.example.taskmanagementsystem.web.controllers;
 
 import com.example.taskmanagementsystem.configurations.properties.AppProperties;
-import com.example.taskmanagementsystem.dto.CommentDto;
 import com.example.taskmanagementsystem.dto.TaskDto;
 import com.example.taskmanagementsystem.entities.Task;
-import com.example.taskmanagementsystem.entities.TaskStatus;
-import com.example.taskmanagementsystem.services.CommentService;
+import com.example.taskmanagementsystem.mappers.TaskMapper;
 import com.example.taskmanagementsystem.services.TaskService;
 import com.example.taskmanagementsystem.web.models.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,8 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,118 +30,70 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
-    private final CommentService commentService;
     private final AppProperties properties;
+    private final TaskMapper taskMapper;
 
     @Operation(summary = "Получить перечень задач по критерию поиска",
-            description = "Фомирует перечень задач по автору (author) и/или исполнителю (worker). Вывод производится " +
+            description = "Формирует перечень задач по автору (author) и/или исполнителю (worker). Вывод производится " +
                     " пакетами с размером не превосходящим предел (limit).")
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public ResponseEntity<?> filterBy(@RequestParam(value = "author", required = false)
+    public Slice<TaskDto> list(@RequestParam(value = "author", required = false)
                                           @Parameter(description = "Автор задач для выборки") String author,
-                                      @RequestParam(value = "worker", required = false)
-                                      @Parameter(description = "Исполнитель задач для выборки") String worker,
-                                      @RequestParam(value = "offset", required = false)
+                                   @RequestParam(value = "executor", required = false)
+                                      @Parameter(description = "Исполнитель задач для выборки") String executor,
+                                   @RequestParam(value = "offset", required = false)
                                           @Parameter(description = "Порядковый номер начального элемента выборки")
                                           Integer offset,
-                                      @RequestParam(value = "limit", required = false)
+                                   @RequestParam(value = "limit", required = false)
                                           @Parameter(description = "Размер пакета выборки") Integer limit) {
-        return new ResponseEntity<>(taskService.getAllFiltered(author, worker, PageRequest
-                .of(Optional.ofNullable(offset).isPresent() ? offset : 0,
-                Optional.ofNullable(limit).isPresent() ? limit : properties.paginationLimit())
-        ), HttpStatus.OK);
+        return taskService.filter(author, executor, PageRequest.of(
+                Optional.ofNullable(offset).orElse(0),
+                Optional.ofNullable(limit).orElse(properties.paginationLimit())
+        ));
     }
 
-    @Operation(summary = "Получить задачу по идентификотору",
+    @Operation(summary = "Получить описание задачи",
             description = "Получает описание задачи по идентификатору (id).")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = { @Content(mediaType = "application/json",
                     schema = @Schema(implementation = Task.class)) }),
             @ApiResponse(responseCode = "404", description = "Задача не найдена",
                     content = @Content) })
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskDto> getTaskById(@PathVariable(name = "id") @Parameter(description = "Идентификационный " +
-            "номер задачи") Long id) {
-        TaskDto taskDto = taskService.getById(id);
-        return new ResponseEntity<>(taskDto, HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping(params = { "title" })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public TaskDto getTask(@RequestParam String title, @AuthenticationPrincipal UserDetails userDetails) {
+        return taskMapper.taskToTaskDto(taskService.findByTitleAndAuthorOrExecutor(title, userDetails.getUsername()));
     }
 
     @Operation(summary = "Зарегистрировать новую задачу",
-            description = "Регистрирует задачу с указанным заголовком.")
+            description = "Регистрирует задачу с указанным в теле запроса заголовком.")
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_AUTHOR')")
-    public ResponseEntity<TaskDto> postTask(@RequestBody TaskCreateRequest taskCreateRequest,
-                                            @AuthenticationPrincipal UserDetails userDetails) {
-        var taskDto = new TaskDto();
-        taskDto.setTitle(taskCreateRequest.getTitle());
-        taskDto.setAuthor(userDetails.getUsername());
-        taskDto.setStatus(TaskStatus.OPEN.name());
-        return new ResponseEntity<>(taskService.getById(taskService.create(taskDto)), HttpStatus.CREATED);
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public TaskDto createTask(@RequestBody TaskRequest request,
+                                              @AuthenticationPrincipal UserDetails userDetails) {
+        return taskService.create(request, userDetails.getUsername());
     }
 
     @Operation(summary = "Обновить задачу",
-            description = "Обновляет заголовок для задачи с указанным идентификатором.")
-    @PutMapping("/{id}")
-    @PreAuthorize("(@taskService.getById(#id).author == principal.username)")
-    public ResponseEntity<TaskDto> updateTask(@PathVariable(name = "id") @Parameter(description = "Идентификационный " +
-            "номер задачи") Long id,
-                                              @RequestBody TaskUpdateRequest taskUpdateRequest,
+            description = "Обновляет аттрибуты задачи с указанным в теле запроса заголовком.")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PutMapping
+    public TaskDto updateTask(@RequestBody TaskRequest request,
                                               @AuthenticationPrincipal UserDetails userDetails) {
-        var taskDto = taskService.getById(id);
-        taskDto.setTitle(taskUpdateRequest.getTitle());
-        taskDto.setAuthor(userDetails.getUsername());
-        taskService.update(taskDto);
-        return new ResponseEntity<>(taskService.getById(id), HttpStatus.OK);
-    }
-
-    @Operation(summary = "Назначить задачу",
-            description = "Назначает исполнителя для задачи с указанным идентификатором.")
-    @PutMapping("/{id}/assign")
-    @PreAuthorize("@taskService.getById(#id).author == principal.username")
-    public ResponseEntity<TaskDto> assignTask(@PathVariable(name = "id") @Parameter(description = "Идентификационный " +
-            "номер задачи") Long id,
-                                              @RequestBody TaskAssignRequest taskAssignRequest,
-                                              @AuthenticationPrincipal UserDetails userDetails) {
-        var taskDto = taskService.getById(id);
-        taskDto.setWorker(taskAssignRequest.getWorker());
-        taskDto.setAuthor(userDetails.getUsername());
-        taskService.assign(taskDto);
-        return new ResponseEntity<>(taskService.getById(id), HttpStatus.OK);
-    }
-
-    @Operation(summary = "Закрыть задачу",
-            description = "Изменяет статус на CLOSED у задачи с указанным идентификатором.")
-    @PutMapping("/{id}/close")
-    @PreAuthorize("(@taskService.getById(#id).worker == principal.username) or " +
-            "(@taskService.getById(#id).author == principal.username)")
-    public ResponseEntity<SimpleResponse> closeTask(@PathVariable(name = "id") @Parameter(description =
-            "Идентификационный номер задачи") Long id) {
-        taskService.close(id);
-        return new ResponseEntity<>(new SimpleResponse("Задача с ID = " + id + " закрыта."), HttpStatus.OK);
+        return taskService.update(request, userDetails.getUsername());
     }
 
     @Operation(summary = "Удалить задачу",
-            description = "Удаляет задачу с указанным идентификатором.")
-    @DeleteMapping("/{id}")
-    @PreAuthorize("(@taskService.getById(#id).author == principal.username)")
-    public ResponseEntity<SimpleResponse> deleteTask(@PathVariable(name = "id") @Parameter(description =
-            "Идентификационный номер задачи") Long id) {
-        taskService.delete(id);
-        return new ResponseEntity<>(new SimpleResponse("Задача с ID = " + id + " удалена."), HttpStatus.NO_CONTENT);
-    }
-
-    @Operation(summary = "Добавить комментарий", description = "Добавляет комментарий к задачу с указанным " +
-            "идентификатором.")
-    @PostMapping(path = "/{id}/comments")
-    public ResponseEntity<CommentDto> postComment(@PathVariable(name="id") @Parameter(description =
-            "Идентификационный номер задачи") Long id,
-                                                  @RequestBody CommentCreateRequest commentCreateRequest,
-                                                  @AuthenticationPrincipal UserDetails userDetails) {
-        var commentDto = new CommentDto();
-        commentDto.setTalker(userDetails.getUsername());
-        commentDto.setTask(id);
-        commentDto.setText(commentCreateRequest.getText());
-        return new ResponseEntity<>(commentService.create(taskService.getById(id), commentDto),
-                HttpStatus.CREATED);
+            description = "Удаляет задачу с указанным в теле запроса заголовком.")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public SimpleResponse deleteTask(@RequestBody TaskRequest request,
+                                                     @AuthenticationPrincipal UserDetails userDetails) {
+        taskService.delete(request, userDetails.getUsername());
+        return new SimpleResponse("Задача = " + request.getTitle() + " удалена.");
     }
 }

@@ -2,14 +2,19 @@ package com.example.taskmanagementsystem.web.controllers;
 
 import com.example.taskmanagementsystem.dto.CommentDto;
 import com.example.taskmanagementsystem.services.CommentService;
+import com.example.taskmanagementsystem.web.models.CommentRequest;
 import com.example.taskmanagementsystem.web.models.SimpleResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.util.Collection;
 
 @RestController
 @SecurityRequirement(name = "Authentication")
@@ -18,32 +23,47 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
     private final CommentService commentService;
 
-    @Operation(summary = "Получить комментарий по идентификотору",
+    @Operation(summary = "Добавить комментарий", description = "Добавляет комментарий к задаче с указанным " +
+            "заголовком.")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping
+    public CommentDto postComment(@RequestBody CommentRequest request,
+                                                  @AuthenticationPrincipal UserDetails userDetails) {
+        return commentService.create(request, userDetails.getUsername());
+    }
+
+    @Operation(summary = "Получить комментарий по идентификатору",
             description = "Получает описание комментария по идентификатору (id).")
-    @GetMapping("/{id}")
-    public ResponseEntity<CommentDto> getCommentById(@PathVariable(name = "id") @Parameter(description =
-            "Идентификационный номер комментария") Long id) {
-        CommentDto comment = commentService.getById(id);
-        return new ResponseEntity<>(comment, HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping
+    public Collection<CommentDto> listComments(@RequestParam(name = "taskTitle")
+                                                         @Parameter(description = "Идентификационный номер комментария")
+                                                     String taskTitle,
+                                                             @AuthenticationPrincipal UserDetails userDetails) {
+        return commentService.listComments(taskTitle, userDetails.getUsername());
     }
 
-    @Operation(summary = "Изменить комментарий по идентификотору",
+    @Operation(summary = "Изменить комментарий по идентификатору",
             description = "Редактирует описание комментария по идентификатору (id).")
-    @PutMapping("/{id}")
-    public ResponseEntity<CommentDto> updateComment(@PathVariable @Parameter(description =
-            "Идентификационный номер комментария") Long id,
-                                           @RequestBody CommentDto commentDto) {
-        commentDto.setId(id);
-        commentService.update(commentDto);
-        return new ResponseEntity<>(commentService.getById(id), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping
+    public CommentDto updateComment(@RequestParam(name = "create_date")
+                                                        @Parameter(description = "Идентификационный номер комментария")
+                                                        Instant createDate,
+                                           @RequestBody CommentRequest request,
+                                                    @AuthenticationPrincipal UserDetails userDetails) {
+        return commentService.update(createDate, request, userDetails.getUsername());
     }
 
-    @Operation(summary = "Удалить комментарий по идентификотору",
+    @Operation(summary = "Удалить комментарий по идентификатору",
             description = "Удалить комментарий по идентификатору (id).")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<SimpleResponse> deleteComment(@PathVariable @Parameter(description =
-            "Идентификационный номер комментария")  Long id) {
-        commentService.delete(id);
-        return new ResponseEntity<>(new SimpleResponse("Комментарий с ID = " + id + " удален."), HttpStatus.NO_CONTENT);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping
+    public SimpleResponse deleteComment(@RequestParam(name = "create_date")
+                                                            @Parameter(description = "Идентификационный номер комментария")
+                                                            Instant createDate,
+                                                        @AuthenticationPrincipal UserDetails userDetails) {
+        commentService.delete(createDate, userDetails.getUsername());
+        return new SimpleResponse("Комментарий от " + createDate + " удален.");
     }
 }

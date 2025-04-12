@@ -19,6 +19,6 @@ public class RedisExpirationEvent {
         }
 
         log.error("Refresh token with key={} has expired! Refresh token is: {}", expiredRefreshToken.getId(),
-                expiredRefreshToken.getToken());
+                expiredRefreshToken.getAccessToken());
     }
 }

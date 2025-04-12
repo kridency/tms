@@ -2,8 +2,8 @@ package com.example.taskmanagementsystem;
 
 import com.example.taskmanagementsystem.entities.RoleType;
 import com.example.taskmanagementsystem.repositories.UserRepository;
-import com.example.taskmanagementsystem.securities.SecurityService;
-import com.example.taskmanagementsystem.web.models.CreateUserRequest;
+import com.example.taskmanagementsystem.securities.UserService;
+import com.example.taskmanagementsystem.web.models.AuthRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +45,7 @@ public class AbstractTest {
     }
 
     @Autowired
-    protected SecurityService securityService;
+    protected UserService userService;
 
     @Autowired
     protected UserRepository userRepository;
@@ -55,11 +55,11 @@ public class AbstractTest {
 
     @BeforeEach
     public void setup() {
-        securityService.register(CreateUserRequest.builder().email("user@usa.net").password("54321")
-                .roles(new HashSet<>() {{add(RoleType.ROLE_EXECUTOR);}}).build());
+        userService.register(AuthRequest.builder().email("user@usa.net").password("54321")
+                .roles(new HashSet<>() {{add(RoleType.ROLE_USER);}}).build());
 
-        securityService.register(CreateUserRequest.builder().email("admin@usa.net").password("12345")
-                .roles(new HashSet<>() {{add(RoleType.ROLE_AUTHOR); add(RoleType.ROLE_EXECUTOR);}}).build());
+        userService.register(AuthRequest.builder().email("admin@usa.net").password("12345")
+                .roles(new HashSet<>() {{ add(RoleType.ROLE_USER); }}).build());
     }
 
     @AfterEach

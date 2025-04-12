@@ -1,7 +1,6 @@
 package com.example.taskmanagementsystem.securities.jwt;
 
 import com.example.taskmanagementsystem.configurations.properties.AppProperties;
-import com.example.taskmanagementsystem.securities.AppUserDetails;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
@@ -10,6 +9,7 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.jsonwebtoken.Jwts;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -20,11 +20,11 @@ import java.util.Date;
 public class JwtUtils {
     private final AppProperties.JwtProperties properties;
 
-    public String generateJwtToken(AppUserDetails userDetails) {
-        return generateTokenFromEmail(userDetails.getUsername());
+    public String generateJwtToken(UserDetails userDetails) {
+        return generateTokenFromUsername(userDetails.getUsername());
     }
 
-    public String generateTokenFromEmail(String username) {
+    public String generateTokenFromUsername(String username) {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
@@ -38,10 +38,10 @@ public class JwtUtils {
                 .build().parseSignedClaims(token).getPayload().getSubject();
     }
 
-    public boolean validate(String authToken) {
+    public boolean validate(String accessToken) {
         try {
             Jwts.parser().verifyWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(properties.secret())))
-                    .build().parseSignedClaims(authToken);
+                    .build().parseSignedClaims(accessToken);
             return true;
         } catch(SignatureException e) {
             log.error("Invalid signature: {}", e.getMessage());

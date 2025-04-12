@@ -33,7 +33,7 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     generate-ddl: true
     show-sql: true
     properties:
@@ -47,7 +47,7 @@ spring:
             schema-generation:
               create-database-schemas: true
         hbm2ddl:
-          auto: update
+          auto: create
           create_namespaces: true
         format_sql: true
         default_schema: task_management_schema

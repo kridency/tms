@@ -1,45 +1,33 @@
 package com.example.taskmanagementsystem.mappers;
 
 import com.example.taskmanagementsystem.dto.UserDto;
-import com.example.taskmanagementsystem.entities.RoleType;
 import com.example.taskmanagementsystem.entities.User;
-import com.example.taskmanagementsystem.services.UserService;
+import com.example.taskmanagementsystem.web.models.AuthRequest;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-@Mapper(componentModel = "spring", uses = { UserService.class })
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring",
+        uses = { RoleMapper.class })
 @Named("UserMapper")
 public interface UserMapper {
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
-
-    @IterableMapping(qualifiedByName = "commentToCommentDto")
-    @Named("fromRoles")
-    default Collection<String> map(Set<RoleType> roles) {
-        return roles.stream().map(RoleType::name).collect(Collectors.toSet());
-    }
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Mappings({
-            @Mapping(source = "id", target = "id"),
             @Mapping(source = "email", target = "email"),
             @Mapping(source = "password", target = "password"),
-            @Mapping(source = "roles", target = "roles", qualifiedByName = "fromRoles")
+            @Mapping(source = "roles", target = "roles")
     })
     UserDto userToUserDto(User user);
 
-    @Named("toRoles")
-    default Set<RoleType> map(Collection<String> roles) {
-        return roles.stream().map(RoleType::valueOf).collect(Collectors.toSet());
+    @Named("encodePassword")
+    default String encodePassword(String plain) {
+        return encoder.encode(plain);
     }
 
     @Mappings({
-            @Mapping(source = "id", target = "id"),
             @Mapping(source = "email", target = "email"),
-            @Mapping(source = "password", target = "password"),
-            @Mapping(source = "roles", target = "roles", qualifiedByName = "toRoles")
+            @Mapping(source = "password", target = "password", qualifiedByName = "encodePassword"),
+            @Mapping(source = "roles", target = "roles", qualifiedByName = {"RoleMapper", "toRoles"})
     })
-    User userDtoToUser(UserDto user);
+    User authRequestToUser(AuthRequest data);
 }
