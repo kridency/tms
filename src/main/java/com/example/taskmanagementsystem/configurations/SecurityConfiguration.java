@@ -2,7 +2,7 @@ package com.example.taskmanagementsystem.configurations;
 
 import com.example.taskmanagementsystem.securities.jwt.JwtAuthenticationEntryPoint;
 import com.example.taskmanagementsystem.securities.jwt.JwtTokenFilter;
-import com.example.taskmanagementsystem.services.TokenService;
+import com.example.taskmanagementsystem.securities.TokenService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -54,8 +55,10 @@ public class SecurityConfiguration {
         http
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/openapi-docs", "/openapi-docs/**", "/swagger-ui/**", "/proxy/**",
-                                        "/api/auth/**", "/api/app/**", "/favicon.ico", "/error")
-                        .permitAll().anyRequest().authenticated()
+                                        "/favicon.ico", "/error").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/tokens").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                                .anyRequest().authenticated()
                 ).exceptionHandling(customizer ->
                         customizer.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 ).cors(Customizer.withDefaults())

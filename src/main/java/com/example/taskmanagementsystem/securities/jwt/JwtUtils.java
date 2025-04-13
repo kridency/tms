@@ -1,6 +1,7 @@
 package com.example.taskmanagementsystem.securities.jwt;
 
 import com.example.taskmanagementsystem.configurations.properties.AppProperties;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
@@ -9,7 +10,6 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.jsonwebtoken.Jwts;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -19,10 +19,6 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtUtils {
     private final AppProperties.JwtProperties properties;
-
-    public String generateJwtToken(UserDetails userDetails) {
-        return generateTokenFromUsername(userDetails.getUsername());
-    }
 
     public String generateTokenFromUsername(String username) {
         return Jwts.builder()
@@ -45,6 +41,8 @@ public class JwtUtils {
             return true;
         } catch(SignatureException e) {
             log.error("Invalid signature: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.info("Expired token: \n{}", e.getMessage());
         } catch(MalformedJwtException e) {
             log.error("Invalid token: {}",e.getMessage());
         } catch(UnsupportedJwtException e) {

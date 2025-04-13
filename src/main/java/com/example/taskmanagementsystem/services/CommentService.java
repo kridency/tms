@@ -33,7 +33,7 @@ public class CommentService {
             User author = task.getAuthor();
             comment.setTalker(author.getEmail().equals(username) ? author : task.getExecutor());
             return commentMapper.commentToCommentDto(commentRepository.save(comment));
-        }).orElseThrow(() -> new BadRequestException("Не указан заголовок задачи."));
+        }).orElseThrow(() -> new BadRequestException("Не указано значение для поля task_title."));
     }
 
     public Collection<CommentDto> listComments(String taskTitle, String username) {

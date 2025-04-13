@@ -35,6 +35,7 @@
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <httpclient5.version>5.4.3</httpclient5.version>
         <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+        <netty.version>4.1.119.Final</netty.version>
         <spring-boot.run.jvmArguments>-Duser.timezone='Timezone/Moscow'</spring-boot.run.jvmArguments>
     </properties>
 
@@ -108,13 +109,13 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
-            <version>4.1.119.Final</version>
+            <version>${netty.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-handler</artifactId>
-            <version>4.1.119.Final</version>
+            <version>${netty.version}</version>
         </dependency>
 
         <dependency>

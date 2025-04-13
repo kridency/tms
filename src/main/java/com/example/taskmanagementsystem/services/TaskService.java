@@ -84,7 +84,7 @@ public class TaskService {
     public Task findByTitleAndAuthorOrExecutor(String title, String username) {
         User user = userService.findByEmail(username);
         return taskRepository.getByTitleAndAuthorOrExecutor(title, user, user)
-                .orElseThrow(() -> new NotFoundException("Задача " + title + " связанную с пользователем "
+                .orElseThrow(() -> new NotFoundException("Задача " + title + " связанная с пользователем "
                         + user.getEmail() + " не найдена."));
     }
 }

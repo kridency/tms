@@ -3,7 +3,7 @@ package com.example.taskmanagementsystem.web.controllers;
 import com.example.taskmanagementsystem.dto.CommentDto;
 import com.example.taskmanagementsystem.services.CommentService;
 import com.example.taskmanagementsystem.web.models.CommentRequest;
-import com.example.taskmanagementsystem.web.models.SimpleResponse;
+import com.example.taskmanagementsystem.dto.MessageDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -58,11 +58,11 @@ public class CommentController {
             description = "Удалить комментарий по идентификатору (id).")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
-    public SimpleResponse deleteComment(@RequestParam(name = "create_date")
+    public MessageDto deleteComment(@RequestParam(name = "create_date")
                                                             @Parameter(description = "Идентификационный номер комментария")
                                                             Instant createDate,
-                                                        @AuthenticationPrincipal String username) {
+                                    @AuthenticationPrincipal String username) {
         commentService.delete(createDate, username);
-        return new SimpleResponse("Комментарий от " + createDate + " удален.");
+        return new MessageDto("Комментарий от " + createDate + " удален.");
     }
 }

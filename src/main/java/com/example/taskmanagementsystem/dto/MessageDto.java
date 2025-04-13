@@ -1,4 +1,4 @@
-package com.example.taskmanagementsystem.web.models;
+package com.example.taskmanagementsystem.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SimpleResponse {
+public class MessageDto {
     private String message;
 }

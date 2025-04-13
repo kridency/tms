@@ -65,10 +65,10 @@ public abstract class AbstractTest {
 
     @BeforeEach
     protected void setup() {
-        userService.register(AuthRequest.builder().email("user@usa.net").password("54321")
+        userService.create(AuthRequest.builder().email("user@usa.net").password("54321")
                 .roles(new HashSet<>() {{add(RoleType.ROLE_USER);}}).build());
 
-        userService.register(AuthRequest.builder().email("admin@usa.net").password("12345")
+        userService.create(AuthRequest.builder().email("admin@usa.net").password("12345")
                 .roles(new HashSet<>() {{ add(RoleType.ROLE_ADMIN); }}).build());
     }
 

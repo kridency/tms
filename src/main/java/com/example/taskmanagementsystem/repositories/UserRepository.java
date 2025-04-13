@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends CrudRepository<User, UUID> {
     Optional<User> getByEmail(String email);
+    Optional<User> deleteByEmail(String email);
 }

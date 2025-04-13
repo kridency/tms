@@ -1,7 +1,7 @@
 package com.example.taskmanagementsystem.web.controllers;
 
 import com.example.taskmanagementsystem.AbstractTest;
-import com.example.taskmanagementsystem.dto.RefreshTokenDto;
+import com.example.taskmanagementsystem.dto.TokenDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class TaskControllerTest extends AbstractTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
         var token = objectMapper
-                .readValue(result.getResponse().getContentAsByteArray(), RefreshTokenDto.class).getAccessToken();
+                .readValue(result.getResponse().getContentAsByteArray(), TokenDto.class).getAccessToken();
 
         String taskTitle = objectMapper.readTree(mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/tasks")
@@ -58,7 +58,7 @@ public class TaskControllerTest extends AbstractTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
         var token = objectMapper
-                .readValue(result.getResponse().getContentAsByteArray(), RefreshTokenDto.class).getAccessToken();
+                .readValue(result.getResponse().getContentAsByteArray(), TokenDto.class).getAccessToken();
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/tasks")

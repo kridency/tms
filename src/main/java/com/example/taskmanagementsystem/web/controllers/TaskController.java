@@ -1,6 +1,7 @@
 package com.example.taskmanagementsystem.web.controllers;
 
 import com.example.taskmanagementsystem.configurations.properties.AppProperties;
+import com.example.taskmanagementsystem.dto.MessageDto;
 import com.example.taskmanagementsystem.dto.TaskDto;
 import com.example.taskmanagementsystem.entities.Task;
 import com.example.taskmanagementsystem.mappers.TaskMapper;
@@ -90,9 +91,9 @@ public class TaskController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public SimpleResponse deleteTask(@RequestBody TaskRequest request,
-                                                     @AuthenticationPrincipal String username) {
+    public MessageDto deleteTask(@RequestBody TaskRequest request,
+                                 @AuthenticationPrincipal String username) {
         taskService.delete(request, username);
-        return new SimpleResponse("Задача = " + request.getTitle() + " удалена.");
+        return new MessageDto("Задача = " + request.getTitle() + " удалена.");
     }
 }

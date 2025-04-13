@@ -6,15 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RefreshTokenDto {
+public class TokenDto {
     @JsonProperty("access_token")
     private String accessToken;
-    @JsonProperty("refresh_token")
-    private UUID refreshToken;
 }
