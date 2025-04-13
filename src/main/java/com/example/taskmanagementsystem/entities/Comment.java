@@ -32,12 +32,6 @@ public class Comment {
     @PrimaryKeyJoinColumn(name = "talker_id", referencedColumnName = "id")
     private User talker;
 
-    public Comment(Task task, String text, User talker) {
-        setTask(task);
-        setText(text);
-        setTalker(talker);
-    }
-
     public UUID getId() {
         return id;
     }

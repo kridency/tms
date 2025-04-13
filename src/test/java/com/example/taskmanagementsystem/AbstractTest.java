@@ -5,6 +5,7 @@ import com.example.taskmanagementsystem.repositories.UserRepository;
 import com.example.taskmanagementsystem.securities.UserService;
 import com.example.taskmanagementsystem.web.models.AuthRequest;
 import com.redis.testcontainers.RedisContainer;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -75,5 +76,11 @@ public abstract class AbstractTest {
     @AfterEach
     protected void afterEach() {
         userRepository.deleteAll();
+    }
+
+    @AfterAll
+    protected static void tearDown() {
+        redisContainer.stop();
+        postgreSQLContainer.stop();
     }
 }

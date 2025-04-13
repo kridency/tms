@@ -23,7 +23,7 @@ public class TaskControllerTest extends AbstractTest {
         UserDetails userDetails = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
          MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/api/auth/login")
+                        .post("/api/tokens")
                         .content("{ \"email\":\"" + userDetails.getUsername()
                                 + "\",\"password\":\"" + userDetails.getPassword() + "\" }")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -40,10 +40,10 @@ public class TaskControllerTest extends AbstractTest {
                 .andReturn().getResponse().getContentAsString()).get("title").asText();
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .post("/api//comments")
+                        .post("/api/comments")
                         .content("{\"task_title\":\"" + taskTitle + "\", \"text\":\"Comment successfully added!\"}")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isCreated());
+                .andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
     }
 
     @Test

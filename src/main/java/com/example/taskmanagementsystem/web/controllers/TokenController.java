@@ -20,7 +20,7 @@ public class TokenController {
     private final AuthenticationManager authenticationManager;
 
     @Operation(summary = "Аутентифицировать пользователя",
-            description = "Аутентифицирует зарегистрированного пользователя.")
+            description = "Аутентифицирует зарегистрированного пользователя и возвращает его электронный пропуск.")
     @ResponseStatus(HttpStatus.OK)
     @PostMapping
     public TokenDto issueToken(@RequestBody @Valid AuthRequest request) {
@@ -29,8 +29,8 @@ public class TokenController {
         return tokenService.create(request.getEmail());
     }
 
-    @Operation(summary = "Обновить жетон пользователя",
-            description = "Обновляет жетон аутентификации пользователя.")
+    @Operation(summary = "Обновить электронный пропуск аутентифицированного пользователя",
+            description = "Обновляет электронный пропуск аутентифицированного пользователя.")
     @ResponseStatus(HttpStatus.OK)
     @PutMapping
     public TokenDto updateToken(@AuthenticationPrincipal String username) {

@@ -77,8 +77,8 @@ public class TaskService {
         return taskMapper.taskToTaskDto(taskRepository.save(task));
     }
 
-    public void delete(TaskRequest request, String username) {
-        taskRepository.delete(findByTitleAndAuthorOrExecutor(request.getTitle(), username));
+    public void delete(String title, String username) {
+        taskRepository.delete(findByTitleAndAuthorOrExecutor(title, username));
     }
 
     public Task findByTitleAndAuthorOrExecutor(String title, String username) {

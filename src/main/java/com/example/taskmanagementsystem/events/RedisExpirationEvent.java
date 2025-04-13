@@ -6,8 +6,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisKeyExpiredEvent;
 import org.springframework.stereotype.Component;
 
-@Component
 @Slf4j
+@Component
 public class RedisExpirationEvent {
 
     @EventListener
