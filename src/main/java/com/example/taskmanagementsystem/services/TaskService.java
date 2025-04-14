@@ -24,6 +24,13 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
 
+    /**
+     * Формирование параметра фильтрации выборки из базы данных задач.
+     * Вспомогательный метод формирования параметра фильтрации выборки из базы данных задач.
+     * @param key   наименование критерия для поиска задач на основе электронного адреса автора
+     *
+     * @return  пара ключ значение параметра фильтрации выборки
+     */
     private Map.Entry<String, User> setCriteriaParameter(String key) {
         return new AbstractMap.SimpleEntry<>(key, Optional.ofNullable(key).map(userService::findByEmail).orElse(null));
     }
