@@ -71,7 +71,7 @@ public class TaskController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public TaskDto getTask(@RequestParam @NotNull(message = "Не указан заголовок задачи (title)") String title,
                            @AuthenticationPrincipal String username) {
-        return taskMapper.taskToTaskDto(taskService.findByTitleAndAuthorOrExecutor(title, username));
+        return taskMapper.taskToTaskDto(taskService.findByTitleAndUsername(title, username));
     }
 
     @Operation(summary = "Зарегистрировать новую задачу",

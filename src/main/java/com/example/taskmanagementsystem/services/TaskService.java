@@ -56,7 +56,7 @@ public class TaskService {
     public TaskDto create(TaskRequest request, String username) {
         User user = userService.findByEmail(username);
         try {
-            return taskMapper.taskToTaskDto(findByTitleAndAuthorOrExecutor(request.getTitle(), username));
+            return taskMapper.taskToTaskDto(findByTitleAndUsername(request.getTitle(), username));
         } catch (NotFoundException e) {
             Task task = taskMapper.taskRequestToTask(request);
             task.setAuthor(user);
@@ -84,7 +84,7 @@ public class TaskService {
      * @return  объект описания результата обращения к базе данных задач
      */
     public TaskDto update(TaskRequest request, String username) {
-        Task task = findByTitleAndAuthorOrExecutor(request.getTitle(), username);
+        Task task = findByTitleAndUsername(request.getTitle(), username);
         if (task.getAuthor().getEmail().equals(username)) {
             Optional.ofNullable(request.getDescription()).ifPresent(task::setDescription);
             Optional.ofNullable(request.getExecutor()).ifPresent(executor -> {
@@ -115,18 +115,18 @@ public class TaskService {
      *
      */
     public void delete(String title, String username) {
-        taskRepository.delete(findByTitleAndAuthorOrExecutor(title, username));
+        taskRepository.delete(findByTitleAndUsername(title, username));
     }
 
     /**
-     * Запускает обращение к базе данных задач для получения объекта по указанному заголовку, автору или исполнителю.
+     * Запускает обращение к базе данных задач для получения объекта по указанному заголовку, автору или исполнителю задачи.
      * Вспомогательный метод для получения объекта задачи, отображающего запись в базе данных.
      * @param title   заголовок задачи
      * @param username имя пользователя, зарегистрировавшего задачу или назначенного исполнителем по задаче.
      *
      * @return  объект задачи, отображающий запись в базе данных
      */
-    public Task findByTitleAndAuthorOrExecutor(String title, String username) {
+    public Task findByTitleAndUsername(String title, String username) {
         User user = userService.findByEmail(username);
         return taskRepository.getByTitleAndAuthorOrExecutor(title, user, user)
                 .orElseThrow(() -> new NotFoundException("Задача " + title + " связанная с пользователем "
