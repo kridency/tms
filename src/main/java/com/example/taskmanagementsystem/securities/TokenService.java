@@ -27,6 +27,13 @@ public class TokenService {
     private final JwtUtils jwtUtils;
     private final TokenRepository tokenRepository;
 
+    /**
+     * Запускает обращение к базе данных электронных пропусков для создания новой записи.
+     * Основной метод для создания записи электронного пропуска в базе данных.
+     * @param username   адрес электронной почты пользователя, отправившего запрос на аутентификацию
+     *
+     * @return  объект описания результата обращения к базе данных электронных пропусков
+     */
     public TokenDto create(String username) {
         User user = userService.findByEmail(username);
         Instant issueDate = Instant.now();
@@ -38,16 +45,36 @@ public class TokenService {
         return TokenDto.builder().accessToken(accessToken).build();
     }
 
+    /**
+     * Запускает обращение к базе данных электронных пропусков для обновления записи.
+     * Основной метод для обновления записи электронного пропуска в базе данных.
+     * @param username   адрес электронной почты пользователя, отправившего запрос на обновление электронного пропуска
+     *
+     * @return  объект описания результата обращения к базе данных электронных пропусков
+     */
     public TokenDto update(String username) {
         User user = userService.findByEmail(username);
         String accessToken = validate(findById(user.getId())).getAccessToken();
         return create(jwtUtils.getUsername(accessToken));
     }
 
+    /**
+     * Запускает обращение к базе данных электронных пропусков для удаления записи.
+     * Основной метод для удаления записи электронного пропуска в базе данных.
+     * @param accessToken   электронный пропуск пользователя, отправившего запрос на завершение активной сессии
+     *
+     */
     public void delete(String accessToken) {
         tokenRepository.deleteByAccessToken(accessToken);
     }
 
+    /**
+     * Проверяет электронный пропуск пользователя на валидность.
+     * Вспомогательный метод для проверки валидности электронного пропуска пользователя.
+     * @param token   объект отображающий запись базы данных электронных пропусков
+     *
+     * @return  объект описания результата обращения к базе данных электронных пропусков
+     */
     public RefreshToken validate(RefreshToken token) {
         String username = jwtUtils.getUsername(token.getAccessToken());
         if(token.getExpiryDate().compareTo(Instant.now()) < 0) {
@@ -64,8 +91,15 @@ public class TokenService {
         return token;
     }
 
-    public RefreshToken findById(UUID refreshToken) {
-        return tokenRepository.findById(refreshToken)
-                .orElseThrow(() -> new NotFoundException(" Refresh token " + refreshToken + " not found "));
+    /**
+     * Проверяет электронный пропуск пользователя на валидность.
+     * Вспомогательный метод для получения записи базы данных электронных пропусков.
+     * @param refreshTokenId   идентификатор записи базы данных электронных пропусков
+     *
+     * @return  объект описания результата обращения к базе данных электронных пропусков
+     */
+    public RefreshToken findById(UUID refreshTokenId) {
+        return tokenRepository.findById(refreshTokenId)
+                .orElseThrow(() -> new NotFoundException(" Refresh token " + refreshTokenId + " not found "));
     }
 }
