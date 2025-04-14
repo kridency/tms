@@ -2,14 +2,8 @@ package com.example.taskmanagementsystem.web.controllers;
 
 import com.example.taskmanagementsystem.AbstractTest;
 import com.example.taskmanagementsystem.dto.CommentDto;
-import com.example.taskmanagementsystem.dto.TokenDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -18,24 +12,7 @@ import java.time.Instant;
 import java.util.Collections;
 
 public class CommentControllerTest extends AbstractTest {
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    private String token;
     private static final String title = "title_1";
-
-    @BeforeEach
-    public void getToken() throws Exception {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        token = objectMapper.readValue(mockMvc.perform(MockMvcRequestBuilders
-                        .post("/api/tokens")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{ \"email\":\"" + userDetails.getUsername()
-                                + "\",\"password\":\"" + userDetails.getPassword() + "\" }"))
-                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
-                .getResponse().getContentAsByteArray(), TokenDto.class).getAccessToken();
-    }
 
     @Test
     @WithMockUser(username = "user@usa.net", password = "54321")

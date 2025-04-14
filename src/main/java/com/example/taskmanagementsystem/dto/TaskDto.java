@@ -16,8 +16,9 @@ public class TaskDto {
     private Instant date;
     private String title;
     private String description;
+    private String author;
+    private String executor;
     private StatusType status;
     private PriorityType priority;
     private Collection<CommentDto> comments;
-    private String author;
 }

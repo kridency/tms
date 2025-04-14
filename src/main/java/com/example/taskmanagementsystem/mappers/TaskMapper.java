@@ -6,8 +6,8 @@ import com.example.taskmanagementsystem.entities.*;
 import com.example.taskmanagementsystem.web.models.TaskRequest;
 import org.mapstruct.*;
 
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = "spring",
@@ -17,12 +17,13 @@ import java.util.Set;
 public interface TaskMapper {
     @IterableMapping(qualifiedByName = {"CommentMapper", "commentToCommentDto"})
     @Named("fromComments")
-    Set<CommentDto> map(Set<Comment> comments);
+    Collection<CommentDto> map(Collection<Comment> comments);
 
     @Mappings({
-            @Mapping(source = "author.email", target = "author"),
             @Mapping(source = "title", target = "title"),
             @Mapping(source = "description", target = "description"),
+            @Mapping(source = "author.email", target = "author"),
+            @Mapping(source = "executor.email", target = "executor"),
             @Mapping(source = "status", target = "status"),
             @Mapping(source = "priority", target = "priority"),
             @Mapping(source = "comments", target = "comments", qualifiedByName = "fromComments")

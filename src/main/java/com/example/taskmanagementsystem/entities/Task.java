@@ -3,8 +3,7 @@ package com.example.taskmanagementsystem.entities;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
 import java.util.UUID;
 
 @Entity
@@ -29,14 +28,13 @@ public class Task {
     @Column(name = "priority")
     private PriorityType priority;
     @OneToMany(mappedBy = "task", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<Comment> comments;
+    private Collection<Comment> comments;
 
     public Task(String title, String description, StatusType status, PriorityType priority) {
         setTitle(title);
         setDescription(description);
         setStatus(status);
         setPriority(priority);
-        comments = new HashSet<>();
     }
 
     public UUID getId() {
@@ -95,11 +93,11 @@ public class Task {
         this.priority = priority;
     }
 
-    public Set<Comment> getComments() {
+    public Collection<Comment> getComments() {
         return comments;
     }
 
-    public void setComments(Set<Comment> comments) {
+    public void setComments(Collection<Comment> comments) {
         this.comments = comments;
     }
 }

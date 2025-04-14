@@ -49,6 +49,7 @@ public class TaskService {
                     })
             );
             Optional.ofNullable(request.getPriority()).ifPresent(task::setPriority);
+            task.setComments(Collections.emptyList());
             return taskMapper.taskToTaskDto(taskRepository.save(task));
         }
     }

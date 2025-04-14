@@ -15,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class AuthRequest {
+    @NotNull(message = "Не указано значение для поля email.")
     @Email(message = "Недопустимое значение для адреса электронной почты.")
     private String email;
     @NotNull(message = "Не указано значение для поля password.")
