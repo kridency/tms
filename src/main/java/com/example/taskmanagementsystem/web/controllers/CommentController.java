@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Past;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -29,6 +30,7 @@ public class CommentController {
             description = "Добавляет комментарий к задаче с указанным заголовком (title).")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
+    @Transactional
     public CommentDto postComment(@RequestParam(name = "title")
                                       @Parameter(description = "Заголовок задачи")
                                       @NotNull(message = "Не указан заголовок задачи (title)") String title,
@@ -52,6 +54,7 @@ public class CommentController {
             description = "Редактирует описание комментария по дате публикации (create_date).")
     @ResponseStatus(HttpStatus.CREATED)
     @PutMapping
+    @Transactional
     public CommentDto updateComment(@RequestParam(name = "create_date")
                                         @Parameter(description = "Идентификационный номер комментария")
                                         @Past(message = "Дата не принадлежит прошедшему периоду") Instant createDate,
@@ -64,6 +67,7 @@ public class CommentController {
             description = "Удалить комментарий по дате публикации (create_date).")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
+    @Transactional
     public MessageDto deleteComment(@RequestParam(name = "create_date")
                                         @Parameter(description = "Идентификационный номер комментария")
                                         @Past(message = "Дата не принадлежит прошедшему периоду") Instant createDate,

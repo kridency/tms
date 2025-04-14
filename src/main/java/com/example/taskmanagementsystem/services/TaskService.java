@@ -24,14 +24,35 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
 
+    private Map.Entry<String, User> setCriteriaParameter(String key) {
+        return new AbstractMap.SimpleEntry<>(key, Optional.ofNullable(key).map(userService::findByEmail).orElse(null));
+    }
+
+    /**
+     * Составляет выборку из базы данных задач согласно указанным параметрам и настройка пагинации.
+     * Основной метод для составления выборки на основе критериев фильтрации.
+     * @param author   значение критерия для поиска задач на основе электронного адреса автора
+     * @param executor значение критерия для поиска задач на основе электронного адреса исполнителя
+     * @param pageable настройки пагинации для составления выборки
+     *
+     * @return  выборка из базы данных задач согласно установленным параметрам
+     */
     public Slice<TaskDto> filter(String author, String executor, Pageable pageable) {
         Collection<TaskDto> result = taskRepository.findAll(new TaskSpecification(new HashMap<>() {{
-                put("author", Optional.ofNullable(author).map(userService::findByEmail).orElse(null));
-                put("executor", Optional.ofNullable(executor).map(userService::findByEmail).orElse(null));
+                entrySet().add(setCriteriaParameter(author));
+                entrySet().add(setCriteriaParameter(executor));
             }}), pageable).getContent().stream().map(taskMapper::taskToTaskDto).toList();
         return new SliceImpl<>(result.stream().toList(), pageable, result.iterator().hasNext());
     }
 
+    /**
+     * Запускает обращение к базе данных задач для создания новой записи.
+     * Основной метод для создания записи задачи в базе данных.
+     * @param request   объект описания аттрибутов создаваемой задачи
+     * @param username имя пользователя, отправившего запрос на создание записи задачи
+     *
+     * @return  объект описания результата обращения к базе данных задач
+     */
     public TaskDto create(TaskRequest request, String username) {
         User user = userService.findByEmail(username);
         try {
@@ -54,6 +75,14 @@ public class TaskService {
         }
     }
 
+    /**
+     * Запускает обращение к базе данных задач для обновления существующей записи.
+     * Основной метод для обновления записи задачи в базе данных.
+     * @param request   объект описания аттрибутов обновляемой задачи
+     * @param username имя пользователя, отправившего запрос на обновление записи задачи
+     *
+     * @return  объект описания результата обращения к базе данных задач
+     */
     public TaskDto update(TaskRequest request, String username) {
         Task task = findByTitleAndAuthorOrExecutor(request.getTitle(), username);
         if (task.getAuthor().getEmail().equals(username)) {
@@ -78,10 +107,25 @@ public class TaskService {
         return taskMapper.taskToTaskDto(taskRepository.save(task));
     }
 
+    /**
+     * Запускает обращение к базе данных задач для удаления существующей записи.
+     * Основной метод для удаления записи задачи в базе данных.
+     * @param title   заголовок удаляемой задачи
+     * @param username имя пользователя, отправившего запрос на удаление записи задачи
+     *
+     */
     public void delete(String title, String username) {
         taskRepository.delete(findByTitleAndAuthorOrExecutor(title, username));
     }
 
+    /**
+     * Запускает обращение к базе данных задач для получения объекта по указанному заголовку, автору или исполнителю.
+     * Вспомогательный метод для получения объекта задачи, отображающего запись в базе данных.
+     * @param title   заголовок задачи
+     * @param username имя пользователя, зарегистрировавшего задачу или назначенного исполнителем по задаче.
+     *
+     * @return  объект задачи, отображающий запись в базе данных
+     */
     public Task findByTitleAndAuthorOrExecutor(String title, String username) {
         User user = userService.findByEmail(username);
         return taskRepository.getByTitleAndAuthorOrExecutor(title, user, user)

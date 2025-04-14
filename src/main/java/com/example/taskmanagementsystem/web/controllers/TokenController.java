@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +24,7 @@ public class TokenController {
             description = "Аутентифицирует зарегистрированного пользователя и возвращает его электронный пропуск.")
     @ResponseStatus(HttpStatus.OK)
     @PostMapping
+    @Transactional
     public TokenDto issueToken(@RequestBody @Valid AuthRequest request) {
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -33,6 +35,7 @@ public class TokenController {
             description = "Обновляет электронный пропуск аутентифицированного пользователя.")
     @ResponseStatus(HttpStatus.OK)
     @PutMapping
+    @Transactional
     public TokenDto updateToken(@AuthenticationPrincipal String username) {
         return tokenService.update(username);
     }

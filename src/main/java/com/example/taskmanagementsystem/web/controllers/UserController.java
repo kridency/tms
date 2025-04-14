@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,6 +22,7 @@ public class UserController {
             description = "Регистрирует нового пользователя.")
     @ResponseStatus(HttpStatus.OK)
     @PostMapping
+    @Transactional
     public MessageDto registerUser(@RequestBody @Valid AuthRequest request) {
         userService.create(request);
         return new MessageDto("User created!");
@@ -30,6 +32,7 @@ public class UserController {
             description = "Обновляет адрес электронной почты, пароль и перечень ролей пользователя.")
     @ResponseStatus(HttpStatus.OK)
     @PutMapping
+    @Transactional
     public UserDto updateUser(@RequestBody @Valid AuthRequest request, @AuthenticationPrincipal String username) {
         return userService.update(request, username);
     }
@@ -38,6 +41,7 @@ public class UserController {
             description = "Удаляет учетные данные пользователя.")
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping
+    @Transactional
     public UserDto deleteUser(@AuthenticationPrincipal String username) {
         return userService.delete(username);
     }

@@ -22,6 +22,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -78,6 +79,7 @@ public class TaskController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Transactional
     public TaskDto createTask(@RequestBody @Valid TaskRequest request, @AuthenticationPrincipal String username) {
         return taskService.create(request, username);
     }
@@ -86,6 +88,7 @@ public class TaskController {
             description = "Обновляет аттрибуты задачи указанными в теле запроса значениями.")
     @ResponseStatus(HttpStatus.CREATED)
     @PutMapping
+    @Transactional
     public TaskDto updateTask(@RequestBody @Valid TaskRequest request,
                               @AuthenticationPrincipal String username) {
         return taskService.update(request, username);
@@ -96,6 +99,7 @@ public class TaskController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Transactional
     public MessageDto deleteTask(@RequestParam("title")
                                      @NotNull(message = "Не указан заголовок задачи (title)") String title,
                                  @AuthenticationPrincipal String username) {
