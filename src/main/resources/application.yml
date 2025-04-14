@@ -68,5 +68,5 @@ springdoc:
     path: /openapi-docs
   swagger-ui:
     enabled: true
-    path: /swagger-ui/index.html
+    path: /index.html
   enable-spring-security: true
