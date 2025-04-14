@@ -2,6 +2,7 @@ package com.example.taskmanagementsystem.web.controllers;
 
 import com.example.taskmanagementsystem.AbstractTest;
 import com.example.taskmanagementsystem.dto.CommentDto;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -16,6 +17,7 @@ public class CommentControllerTest extends AbstractTest {
 
     @Test
     @WithMockUser(username = "user@usa.net", password = "54321")
+    @DisplayName("Попытка получить описание комментариев по заданному заголовку задачи.")
     public void givenUserAndTask_whenPostAndGetComment_thenReturnCorrect() throws Exception {
         CommentDto comment = objectMapper.readValue(mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/comments")
@@ -38,6 +40,7 @@ public class CommentControllerTest extends AbstractTest {
 
     @Test
     @WithMockUser(username = "user@usa.net", password = "54321")
+    @DisplayName("Попытка обновления описание комментария по заданной дате публикации.")
     public void givenUserAndTask_whenPostAndUpdateComment_thenReturnCorrect() throws Exception {
         Instant createDate = objectMapper.readValue(mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/comments")
@@ -59,6 +62,7 @@ public class CommentControllerTest extends AbstractTest {
 
     @Test
     @WithMockUser(username = "user@usa.net", password = "54321")
+    @DisplayName("Попытка удаления комментария по заданной дате публикации.")
     public void givenUserAndTask_whenPostAndDeleteComment_thenReturnCorrect() throws Exception {
         Instant createDate = objectMapper.readValue(mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/comments")
