@@ -1,9 +1,13 @@
 package com.example.taskmanagementsystem;
 
+import com.example.taskmanagementsystem.entities.PriorityType;
 import com.example.taskmanagementsystem.entities.RoleType;
+import com.example.taskmanagementsystem.repositories.TaskRepository;
 import com.example.taskmanagementsystem.repositories.UserRepository;
 import com.example.taskmanagementsystem.securities.UserService;
+import com.example.taskmanagementsystem.services.TaskService;
 import com.example.taskmanagementsystem.web.models.AuthRequest;
+import com.example.taskmanagementsystem.web.models.TaskRequest;
 import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -17,7 +21,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -29,7 +32,6 @@ import java.util.HashSet;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Transactional
 @Testcontainers
 public abstract class AbstractTest {
     @Container
@@ -52,9 +54,13 @@ public abstract class AbstractTest {
 
     @Autowired
     protected UserService userService;
+    @Autowired
+    protected TaskService taskService;
 
     @Autowired
     protected UserRepository userRepository;
+    @Autowired
+    protected TaskRepository taskRepository;
 
     @Autowired
     protected MockMvc mockMvc;
@@ -71,10 +77,14 @@ public abstract class AbstractTest {
 
         userService.create(AuthRequest.builder().email("admin@usa.net").password("12345")
                 .roles(new HashSet<>() {{ add(RoleType.ROLE_ADMIN); }}).build());
+
+        taskService.create(new TaskRequest("title_1", "description", "user@usa.net",
+                null, PriorityType.LOW), "admin@usa.net");
     }
 
     @AfterEach
     protected void afterEach() {
+        taskRepository.deleteAll();
         userRepository.deleteAll();
     }
 

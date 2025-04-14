@@ -13,7 +13,7 @@ public class CommentDto {
     private Instant createDate;
     @JsonProperty("update_date")
     private Instant updateDate;
-    private String taskTitle;
+    private String title;
     private String text;
     private String talker;
 }

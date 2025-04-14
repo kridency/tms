@@ -10,7 +10,7 @@ import org.mapstruct.*;
 public interface CommentMapper {
     @Mappings({
             @Mapping(source = "talker.email", target = "talker"),
-            @Mapping(source = "task.title", target = "taskTitle"),
+            @Mapping(source = "task.title", target = "title"),
             @Mapping(source = "createDate", target = "createDate"),
             @Mapping(source = "updateDate", target = "updateDate"),
             @Mapping(source = "text", target = "text")

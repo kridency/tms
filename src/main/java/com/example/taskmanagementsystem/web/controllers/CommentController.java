@@ -50,7 +50,7 @@ public class CommentController {
 
     @Operation(summary = "Изменить комментарий по дате публикации",
             description = "Редактирует описание комментария по дате публикации (create_date).")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     @PutMapping
     public CommentDto updateComment(@RequestParam(name = "create_date")
                                         @Parameter(description = "Идентификационный номер комментария")

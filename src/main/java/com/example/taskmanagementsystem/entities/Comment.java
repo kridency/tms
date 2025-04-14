@@ -20,10 +20,12 @@ public class Comment {
     @PrimaryKeyJoinColumn(name = "task_id", referencedColumnName = "id")
     private Task task;
     @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_date")
     private Instant createDate;
     @Version
     @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "update_date")
     private Instant updateDate;
     @Column(name = "text")
