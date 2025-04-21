@@ -21,10 +21,11 @@ public class JwtUtils {
     private final AppProperties.JwtProperties properties;
 
     public String generateTokenFromUsername(String username) {
+        Date date = new Date();
         return Jwts.builder()
                 .subject(username)
-                .issuedAt(new Date())
-                .expiration(new Date(new Date().getTime() + properties.tokenExpiration().toMillis()))
+                .issuedAt(date)
+                .expiration(new Date(date.getTime() + properties.tokenExpiration().toMillis()))
                 .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(properties.secret())))
                 .compact();
     }

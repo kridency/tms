@@ -25,14 +25,14 @@ public class TaskService {
     private final TaskMapper taskMapper;
 
     /**
-     * Формирование параметра фильтрации выборки из базы данных задач.
-     * Вспомогательный метод формирования параметра фильтрации выборки из базы данных задач.
-     * @param key   наименование критерия для поиска задач на основе электронного адреса автора
+     * Формирование значения параметра фильтрации выборки из базы данных задач.
+     * Вспомогательный метод формирования значения параметра фильтрации выборки из базы данных задач.
+     * @param key   наименование критерия для поиска задач на основе адреса электронной почты автора
      *
-     * @return  пара ключ значение параметра фильтрации выборки
+     * @return  объект отображения записи данных пользователей
      */
-    private Map.Entry<String, User> setCriteriaParameter(String key) {
-        return new AbstractMap.SimpleEntry<>(key, Optional.ofNullable(key).map(userService::findByEmail).orElse(null));
+    private User setCriteriaParameter(String key) {
+        return Optional.ofNullable(key).map(userService::findByEmail).orElse(null);
     }
 
     /**
@@ -40,15 +40,16 @@ public class TaskService {
      * Основной метод для составления выборки на основе критериев фильтрации.
      * @param author   значение критерия для поиска задач на основе электронного адреса автора
      * @param executor значение критерия для поиска задач на основе электронного адреса исполнителя
-     * @param pageable настройки пагинации для составления выборки
+     * @param pageable настройки пагинации для составления
+     *                 
      *
      * @return  выборка из базы данных задач согласно установленным параметрам
      */
     public Slice<TaskDto> filter(String author, String executor, Pageable pageable) {
         Collection<TaskDto> result = taskRepository.findAll(new TaskSpecification(new HashMap<>() {{
-                entrySet().add(setCriteriaParameter(author));
-                entrySet().add(setCriteriaParameter(executor));
-            }}), pageable).getContent().stream().map(taskMapper::taskToTaskDto).toList();
+            put("author", setCriteriaParameter(author));
+            put("executor", setCriteriaParameter(executor));
+        }}), pageable).getContent().stream().map(taskMapper::taskToTaskDto).toList();
         return new SliceImpl<>(result.stream().toList(), pageable, result.iterator().hasNext());
     }
 
